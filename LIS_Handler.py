@@ -48,8 +48,11 @@ def load_Delay(name, file, start):
                         data = float(lines[len(T)+2: len(T)+2+15]) / 1000
                         if lines[len(T)+2: len(T)+17] == 'p':
                             data /= 1000
-                        ws[f"{chr(ord(start[0]) + Delay_type[T])}{int(start[1:]) + 5 + int(cl)}"] = data
-                        count += 1
+                        try:
+                            ws[f"{chr(ord(start[0]) + Delay_type[T])}{int(start[1:]) + 5 + int(cl)}"] = data
+                            count += 1
+                        except:
+                            return -3
 
     if count == 16:
         return 1
@@ -73,8 +76,11 @@ def load_Power(name, file, start, cl):
             data = float(line[idx+9:idx+9+14])
             if line[idx+9+14] == 'p':
                 data /= 1000
-            ws[f"{chr(ord(start[0]) + 9)}{int(start[1:]) + 5 + int(cl)}"] = data
-            count += 1
+            try:
+                ws[f"{chr(ord(start[0]) + 9)}{int(start[1:]) + 5 + int(cl)}"] = data
+                count += 1
+            except:
+                return -3
 
 
         if file[i].find("meas_variable = src_power") != -1:
@@ -83,8 +89,11 @@ def load_Power(name, file, start, cl):
             data = float(line[idx+9:idx+9+14])
             if line[idx+9+14] == 'p':
                 data /= 1000
-            ws[f"{chr(ord(start[0]) + 10)}{int(start[1:]) + 5 + int(cl)}"] = data
-            count += 1
+            try:
+                ws[f"{chr(ord(start[0]) + 10)}{int(start[1:]) + 5 + int(cl)}"] = data
+                count += 1
+            except:
+                return -3
 
     if count == 2:
         return 1
@@ -113,10 +122,15 @@ for names in listdir():
             start += "A"
         elif Pre_Post == "Post":
             start += "N"
+        else:
+            print(f"ERROR -> {names}: 檔案名稱格式錯誤，第一項只能填寫 Pre or Post")
+
         if input == "B":
             start += "12"
-        else:
+        elif input == "A":
             start += "1"
+        elif input != "":
+            print(f"ERROR -> {names}: 檔案名稱格式錯誤，輸入端格式錯誤(目前只能填寫 A or B)")
         
         res = 0
         file = open(names, "r").readlines()
@@ -128,6 +142,8 @@ for names in listdir():
         if res == -1:
             print(f"ERROR -> {names}: 工作表 {Name} 不存在")
         elif res == -2:
-            print(f"ERROR -> {names}: 無法完整加載所有數據，請檢查 .lis 檔")
+            print(f"ERROR -> {names}: 無法完整加載所有數據，請檢查 .lis 檔是否完整")
+        elif res == -3:
+            print(f"ERROR -> {names}: 無法完整加載所有數據，請檢查檔案名稱格式或 .lis 檔是否完整")
 
 #ex.save(excel_path)
